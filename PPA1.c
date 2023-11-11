@@ -13,7 +13,7 @@
 // ================================
 int exitFlag;   // Program Exiting Flag, used to determine whether to leave the program loop and shutdown the program
 char command; // stores the latest command/input
-static int startPosition = 0; // Global variable
+static int startPosition = 0; 
 static char displayString[21] = ">><<                "; // 20 characters + NULL
 static int direction = -1; // -1 for left, 1 for right
 // Add more variables here as needed
@@ -216,10 +216,8 @@ void RunLogic(void)
         command = '\0';
     }
 
-    // Ensure the string is NULL-terminated
     displayString[displayLength - 1] = '\0';
 
-    // Update logic for startPosition
     startPosition += direction;
     if (startPosition < 0) startPosition = displayLength - 1;
     if (startPosition >= displayLength) startPosition = 0;
@@ -264,11 +262,8 @@ void DrawScreen(void)
     // [TODO]: Complete the implementation of the above pseudocode
     MacUILib_clearScreen();
 
-    // Draw static content
     MacUILib_printf("McMaster Marquee Display\n");
     MacUILib_printf("====================\n");
-
-    // Draw marquee display with wrap-around logic
     for (int i = 0; i < 20; i++) {
         int charIndex = (startPosition + i) % 20;
         MacUILib_printf("%c", displayString[charIndex]);

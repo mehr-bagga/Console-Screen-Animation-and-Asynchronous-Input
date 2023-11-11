@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "MacUILib.h"
+#include <ctype.h>
 
 
 // PREPROCESSOR DIRECTIVE CONSTANTS
@@ -11,7 +12,10 @@
 // GLOBAL VARIABLES
 // ================================
 int exitFlag;   // Program Exiting Flag, used to determine whether to leave the program loop and shutdown the program
-
+char command; // stores the latest command/input
+static int startPosition = 0; // Global variable
+static char displayString[21] = ">><<                "; // 20 characters + NULL
+static int direction = -1; // -1 for left, 1 for right
 // Add more variables here as needed
 
 
@@ -90,7 +94,7 @@ void Initialize(void)
 
 
     // [TODO]: Add more variables initializations here as seen needed.
-
+    command = '\0';
 
 
 
@@ -132,7 +136,9 @@ void GetInput(void)
     //   2. If there is an input character waiting to be processed, get the character and store it as the "command"
     //      - again, read the lab manual to find out which MacUILib function you need to use.
     //   3. If there is no input character to be processed, just don't do anything and move on.
-    
+    if (MacUILib_hasChar()) {
+        command = MacUILib_getChar();
+    }
 
 
 
@@ -192,14 +198,36 @@ void RunLogic(void)
     // DONE
 
     // [TODO]: Implement the above pseudocode logic
+    int displayLength = 20; // Total length of the display area
 
+    if (command != '\0') {
+        if (command == 'x') {
+            exitFlag = 1;
+        } else if (command == 't') {
+            direction *= -1;
+        } else if (isalnum(command)) {
+            // Shift characters to the right to make space for the new character
+            // Start from the second-to-last position in the marquee area
+            for (int i = displayLength - 3; i > 2; i--) {
+                displayString[i] = displayString[i - 1];
+            }
+            displayString[2] = command; // Insert new character after ">>"
+        }
+        command = '\0';
+    }
 
+    // Ensure the string is NULL-terminated
+    displayString[displayLength - 1] = '\0';
 
-
+    // Update logic for startPosition
+    startPosition += direction;
+    if (startPosition < 0) startPosition = displayLength - 1;
+    if (startPosition >= displayLength) startPosition = 0;
+}
     // DO NOT print anything out.  This routine is the "thinking" part, not the "acting" part.
     // You should only update all the key program parameters here.
     
-}
+
 
 
 
@@ -234,8 +262,19 @@ void DrawScreen(void)
     //        and HEED THE WRAPAROUND.
     
     // [TODO]: Complete the implementation of the above pseudocode
+    MacUILib_clearScreen();
 
+    // Draw static content
+    MacUILib_printf("McMaster Marquee Display\n");
+    MacUILib_printf("====================\n");
 
+    // Draw marquee display with wrap-around logic
+    for (int i = 0; i < 20; i++) {
+        int charIndex = (startPosition + i) % 20;
+        MacUILib_printf("%c", displayString[charIndex]);
+    }
+    MacUILib_printf("\n");
+    MacUILib_printf("====================\n");
 
 }
 
@@ -253,7 +292,7 @@ void LoopDelay(void)
 {
     // [TODO]: For now, just call the MacUILib_Delay routine here, and introduce sufficient delay constant so that the marquee display runs at a comfortable speed.
     
-
+    MacUILib_Delay(100);  // Adjust the delay as needed
 
     // In future activities, we may delve into other delaying methods.
 }

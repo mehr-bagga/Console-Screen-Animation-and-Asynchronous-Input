@@ -1,5 +1,6 @@
 #include "MacUILib.h"
-
+//#include <unistd.h>
+//#include <windows.h>
 print_ptr MacUILib_printf;
 
 #ifdef WINDOWS
@@ -19,6 +20,7 @@ print_ptr MacUILib_printf;
 
 	void MacUILib_Delay(int usec)
 	{
+		//Sleep(usec / 1000);  // Sleep takes milliseconds, so divide by 1000 to convert microseconds to milliseconds
 		usleep(usec);
 	}
 	
